@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,13 +18,14 @@ public class MyService extends Service {
 
     final String LOG_TAG = "myLogs";
     final String[] CLIENTS = {"TP-LINK_7FA15C", "test1", "test"}; //список извесных точек
+    final long WAITING = 60 * 60 * 6 * 1000; //(секунд)время ожидания удаления файла после которого
+                                      // возможно новое уведомление
     private ArrayList<String> points; //возвращенные точки после скакнирования
-    private ArrayList<String> templatePoints; //Для временного хранения точек
     public boolean isRunning = false; //Для проверки на запущеный сервис или нет
 
-    WriteReadFile writeReadFile = new WriteReadFile(this);
     MyNotify myNotify = new MyNotify(this);
     MyWiFi myWiFi = new MyWiFi(this);
+    Files fl = new Files(this);
 
     public void onCreate(){
         super.onCreate();
@@ -50,62 +53,52 @@ public class MyService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //templatePoints = new ArrayList<>();
 
                 while (true) {
                     points = myWiFi.getPoints();
                     for (String client : CLIENTS) {
                         Log.d(LOG_TAG, client);
-                        templatePoints = templatePointsGet();
                         if (points.contains(client)) {
-                            Log.d(LOG_TAG, client + " avialable");
-                            if (templatePoints.contains(client)) {
+                            if (fl.checkFile(client)) {
                                 Log.d(LOG_TAG, client + "conteins in tmp");
                                 try {
-                                    TimeUnit.SECONDS.sleep(5);
+                                    TimeUnit.SECONDS.sleep(10);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
                                 continue;
                             } else {
-                                templatePoints.add(client);
-                                writeReadFile.writeFile(templatePoints);
-                                myNotify.sendNotif();
                                 Log.d(LOG_TAG, client + " add in tmp");
                                 try {
-                                    TimeUnit.SECONDS.sleep(5);
+                                    fl.createFile(client);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                myNotify.sendNotif();
+                                try {
+                                    TimeUnit.SECONDS.sleep(10);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
                             }
-                        } else if (templatePoints.contains(client)) {
-                            templatePoints.remove(client);
-                            writeReadFile.writeFile(templatePoints);
-                            Log.d(LOG_TAG, client + " remove from tmp");
+                        } else if (fl.checkFile(client)) {
+                            Date date = new Date();
+                            long lastModifiedFile = fl.getLastModifiedFile(client);
+                            if (date.getTime() - lastModifiedFile > WAITING){
+                                fl.removeFile(client);
+                                Log.d(LOG_TAG, client + " remove from tmp");
+                            }
                         }
                     }
                     Log.d(LOG_TAG, "scan");
                     try {
-                        TimeUnit.SECONDS.sleep(5);
+                        TimeUnit.SECONDS.sleep(20);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }).start();
-    }
-
-    public ArrayList<String> templatePointsGet(){
-        try {
-            templatePoints = writeReadFile.readFile();
-            if (templatePoints.isEmpty()){
-                Log.d(LOG_TAG, "tmp empty first");
-            }
-        } catch (Exception e){
-            Log.d(LOG_TAG, "File not exist!");
-            templatePoints = new ArrayList<>();
-        }
-        return templatePoints;
     }
 
     @Nullable
