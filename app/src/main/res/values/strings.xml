@@ -3,6 +3,10 @@
     <string name="start">Start Service</string>
     <string name="enableWiFi">Включить WiFi</string>
     <string name="remindLeter">Напомнить позже</string>
-    <string name="discriptionWiFiOffActivity">Для корректной работы программы требуется активировать работу WIFi.</string>
+    <string name="discriptionWiFiOffActivity">Для корректной работы программы
+                                              требуется активировать работу WIFi.</string>
     <string name="title_activity_wi_fi_off">WiFiOffActivity</string>
+    <string name="title_activity_notify">NotifyActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

@@ -64,7 +64,6 @@ public class MyWiFi {
                 .getSystemService(Context.WIFI_SERVICE);
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
-        Log.d(LOG_TAG, "hour " + hour);
         if (!wifi.isWifiEnabled()) { //Проверяем выключен WIFI тогда уведомление
             if( hour > 10 & hour < 20){
                 myNotify = new MyNotify(context);

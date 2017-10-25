@@ -18,9 +18,11 @@ public class MyService extends Service {
 
     final String LOG_TAG = "myLogs";
     final String[] CLIENTS = {"TP-LINK_7FA15C"}; //список извесных точек
-    final int SLEEP = 60;
-    final long WAITING = 30 * 60 * 1000; //(секунд)время ожидания удаления файла после которого
-                                      // возможно новое уведомление
+    final int SLEEP = 10;  //test
+    final long WAITING =  60 * 1000; //test
+    //final int SLEEP = 30;
+    //final long WAITING = 20 * 60 * 60 * 1000; //(секунд)время ожидания удаления файла после которого
+                                              // возможно новое уведомление
     private ArrayList<String> points; //возвращенные точки после скакнирования
     public boolean isRunning = false; //Для проверки на запущеный сервис или нет
     private String reminder = "reminder"; //Название файла для напоминания
@@ -59,7 +61,6 @@ public class MyService extends Service {
                 while (true) {
                     points = myWiFi.getPoints();
                     for (String client : CLIENTS) {
-                        Log.d(LOG_TAG, client);
                         if (points.contains(client)) {
                             if (fl.checkFile(client)) {
                                 Log.d(LOG_TAG, client + "conteins in tmp");
@@ -70,7 +71,6 @@ public class MyService extends Service {
                                 }
                                 continue;
                             } else {
-                                Log.d(LOG_TAG, client + " add in tmp");
                                 try {
                                     fl.createFile(client);
                                 } catch (IOException e) {
@@ -89,9 +89,7 @@ public class MyService extends Service {
                             }
                         }
                     }
-                    Log.d(LOG_TAG, "scan");
                     if(fl.checkFile(reminder)) {
-                        Log.d(LOG_TAG, "reminder " + getDelta(reminder) + " (" + WAITING + " ) ");
                         if (getDelta(reminder) > WAITING) {
                             fl.removeFile(reminder);
                             try {

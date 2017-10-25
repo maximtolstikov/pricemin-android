@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,11 +35,18 @@
 
         <activity
             android:name=".WiFiOffActivity"
+            android:excludeFromRecents="true"
             android:label="@string/title_activity_wi_fi_off"
-            android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask"
             android:taskAffinity=""
-            android:excludeFromRecents="true"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".NotifyActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_notify"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>

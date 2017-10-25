@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 
-public class MainActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity {
 
     final int MY_PERMISSIONS_LOCATION = 0;
 

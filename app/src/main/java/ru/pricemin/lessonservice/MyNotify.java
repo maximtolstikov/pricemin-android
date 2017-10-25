@@ -21,6 +21,7 @@ public class MyNotify {
     private Context context;
     private static final int NOTIFY_ID = 101;
 
+    // Вызывает уведомление если обнаруживается point,  по нажатию загружает контент
     void sendNotif() {
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notif = new NotificationCompat.Builder(context)
@@ -30,12 +31,29 @@ public class MyNotify {
                 .setSound(alarmSound)
                 .setVibrate(new long[] { 1000, 1000, 1000 });
 
+        Intent resultIntent = new Intent(context, NotifyActivity.class);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        // Creates the PendingIntent
+        PendingIntent notifyPendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        // Puts the PendingIntent into the notification builder
+        notif.setContentIntent(notifyPendingIntent);
+        notif.setAutoCancel(true);
+
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
+       // mId allows you to update the notification later on.
         mNotificationManager.notify(NOTIFY_ID, notif.build());
     }
 
+    // Вызывает уведомление если отключен WiFi, по нажатию предлогает его включить либо пропустить
     void sendNotifWifiOff() {
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notif = new NotificationCompat.Builder(context)
@@ -48,7 +66,7 @@ public class MyNotify {
         Intent resultIntent = new Intent(context, WiFiOffActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-// Creates the PendingIntent
+        // Creates the PendingIntent
         PendingIntent notifyPendingIntent =
                 PendingIntent.getActivity(
                         context,
@@ -57,13 +75,13 @@ public class MyNotify {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-// Puts the PendingIntent into the notification builder
+        // Puts the PendingIntent into the notification builder
         notif.setContentIntent(notifyPendingIntent);
         notif.setAutoCancel(true);
 
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
+        // mId allows you to update the notification later on.
         mNotificationManager.notify(NOTIFY_ID, notif.build());
     }
 }

@@ -33,12 +33,14 @@ public class MyFiles {
     public boolean checkFile(String nameFile){
         file = new File(context.getFilesDir(), nameFile);
         fileExist = file.exists();
+        Log.d(LOG_TAG, "check file: " + nameFile + ": " + fileExist);
         return fileExist;
     }
 
     public void removeFile(String nameFile){
         file = new File(context.getFilesDir(), nameFile);
         file.delete();
+        Log.d(LOG_TAG, "delete file: " + nameFile);
     }
     public long getLastModifiedFile(String nameFile){
         file = new File(context.getFilesDir(), nameFile);
