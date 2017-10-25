@@ -11,12 +11,13 @@ import java.io.IOException;
  * Created by name on 17/10/17.
  */
 
-public class Files {
+public class MyFiles {
 
-    public Files(Context ctx){
+    public MyFiles(Context ctx){
         this.context = ctx;
     }
 
+    final String LOG_TAG = "myLogs";
     private Context context;
     Boolean fileExist = false;
     File file;
@@ -26,6 +27,7 @@ public class Files {
         FileWriter writer = new FileWriter(file);
         writer.write(0);
         writer.close();
+        Log.d(LOG_TAG, "create file: " + nameFile);
         }
 
     public boolean checkFile(String nameFile){

@@ -17,15 +17,17 @@ import java.util.concurrent.TimeUnit;
 public class MyService extends Service {
 
     final String LOG_TAG = "myLogs";
-    final String[] CLIENTS = {"TP-LINK_7FA15C", "test1", "test"}; //список извесных точек
-    final long WAITING = 60 * 60 * 6 * 1000; //(секунд)время ожидания удаления файла после которого
+    final String[] CLIENTS = {"TP-LINK_7FA15C"}; //список извесных точек
+    final int SLEEP = 60;
+    final long WAITING = 30 * 60 * 1000; //(секунд)время ожидания удаления файла после которого
                                       // возможно новое уведомление
     private ArrayList<String> points; //возвращенные точки после скакнирования
     public boolean isRunning = false; //Для проверки на запущеный сервис или нет
+    private String reminder = "reminder"; //Название файла для напоминания
 
     MyNotify myNotify = new MyNotify(this);
     MyWiFi myWiFi = new MyWiFi(this);
-    Files fl = new Files(this);
+    MyFiles fl = new MyFiles(this);
 
     public void onCreate(){
         super.onCreate();
@@ -62,7 +64,7 @@ public class MyService extends Service {
                             if (fl.checkFile(client)) {
                                 Log.d(LOG_TAG, client + "conteins in tmp");
                                 try {
-                                    TimeUnit.SECONDS.sleep(10);
+                                    TimeUnit.SECONDS.sleep(SLEEP);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -76,29 +78,51 @@ public class MyService extends Service {
                                 }
                                 myNotify.sendNotif();
                                 try {
-                                    TimeUnit.SECONDS.sleep(10);
+                                    TimeUnit.SECONDS.sleep(SLEEP);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
                             }
                         } else if (fl.checkFile(client)) {
-                            Date date = new Date();
-                            long lastModifiedFile = fl.getLastModifiedFile(client);
-                            if (date.getTime() - lastModifiedFile > WAITING){
+                            if (getDelta(client) > WAITING) {
                                 fl.removeFile(client);
-                                Log.d(LOG_TAG, client + " remove from tmp");
                             }
                         }
                     }
                     Log.d(LOG_TAG, "scan");
+                    if(fl.checkFile(reminder)) {
+                        Log.d(LOG_TAG, "reminder " + getDelta(reminder) + " (" + WAITING + " ) ");
+                        if (getDelta(reminder) > WAITING) {
+                            fl.removeFile(reminder);
+                            try {
+                                myWiFi.checkEnabledWiFi(); //проверяем включен ли WiFi
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        try {
+                            myWiFi.checkEnabledWiFi(); //проверяем включен ли WiFi
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     try {
-                        TimeUnit.SECONDS.sleep(20);
+                        TimeUnit.SECONDS.sleep(SLEEP);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }).start();
+    }
+
+    //Вычисляет разницу текущего времени и времени создания файла
+    long getDelta(String nameFile){
+        Date date = new Date();
+        long lastModifiedFile = fl.getLastModifiedFile(nameFile);
+        long delta =  date.getTime() - lastModifiedFile;
+        return delta;
     }
 
     @Nullable
